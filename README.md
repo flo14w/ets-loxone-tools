@@ -7,16 +7,22 @@ Zwei eigenständige Windows-Desktopprogramme für den Austausch von KNX-Gruppena
 
 Die Anwendungen laufen lokal unter Windows. Sie verbinden sich nicht mit einem Loxone Miniserver.
 
-## Starten
+## Windows-Programme herunterladen und starten
 
-Die Windows-EXE-Dateien und Startskripte sind im Repository-Ordner `dist` beziehungsweise im Projektstamm verfügbar, sofern sie als Release heruntergeladen oder lokal gebaut wurden. Zum Starten aus dem Quellcode ist Python 3.11 mit Tkinter nötig. `Start.cmd` startet ETS → Loxone; `Start-Loxone-zu-ETS.cmd` startet Loxone → ETS.
+Die fertigen Windows-Programme liegen als Downloads im [GitHub-Bereich „Releases“](https://github.com/flo14w/ets-loxone-tools/releases), nicht im Quellcode-Repository. Lade dort `ETS-zu-Loxone-v1.0.1.exe` oder `Loxone-zu-ETS-v1.0.1.exe` herunter und starte die passende EXE direkt. `dist` wird erst beim lokalen Build angelegt und ist deshalb im Repository nicht vorhanden.
+
+Die Startskripte starten eine heruntergeladene EXE neben dem Skript oder eine lokal gebaute EXE in `dist`. Andernfalls starten sie den Quellcode mit Python 3.11 und Tkinter. `Start-ETS-zu-Loxone.cmd` öffnet ETS → Loxone; `Start-Loxone-zu-ETS.cmd` öffnet Loxone → ETS.
 
 ## Dokumentation und Build
 
-- [ETS → Loxone](README-ETS-Loxone.md)
-- [Loxone → ETS](README-Loxone-ETS.md)
+- [ETS → Loxone](README-ETS-zu-Loxone.md)
+- [Loxone → ETS](README-Loxone-zu-ETS.md)
 
-Die `.spec`-Dateien bauen beide Programme mit PyInstaller. `requirements-build.txt` enthält die Build-Abhängigkeit.
+Die `.spec`-Dateien bauen beide Programme mit PyInstaller. Beide EXEs und Fenstertitel beziehen ihre Produktversion aus `version.py`; Windows-Dateieigenschaften und Release-Dateinamen verwenden dieselbe Version. `requirements-build.txt` enthält die Build-Abhängigkeit.
+
+## Mitwirkung und Logo
+
+Der vollständige Quellcode wurde mit OpenAI Codex erstellt. Das Logo wurde mit künstlicher Intelligenz (KI) erstellt.
 
 ## Projektdaten
 
