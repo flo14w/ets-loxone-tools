@@ -302,10 +302,13 @@ class ReverseApp(tk.Tk):
         table.set_data([(i, (r.ga, r.name, 'Ohne DPT' if r.omit_dpt or not r.dpt else r.dpt, self.project.main_names[int(r.ga.split('/')[0])], self.project.middle_names[tuple(map(int, r.ga.split('/')[:2]))], issue or ('Bereit – ohne DPT' if r.omit_dpt or not r.dpt else 'Bereit')), ('warning',) if issue else ()) for i, (r, issue) in enumerate(plan)])
 
     def save(self, win):
-        path = filedialog.asksaveasfilename(parent=win, **dialog_location(str(self.project.path)), initialfile=self.project.path.stem + '_ETS_Gruppenadressen.xml', defaultextension='.xml', filetypes=[('ETS-Gruppenadressen XML', '*.xml')])
+        path = filedialog.asksaveasfilename(parent=win, **dialog_location(str(self.project.path)), initialfile=self.project.path.stem + '_ETS_Gruppenadressen.xml', defaultextension='.xml', confirmoverwrite=True, filetypes=[('ETS-Gruppenadressen XML', '*.xml')])
         if path:
             try:
-                count = self.project.export(path)
+                # The save dialog has already asked the user before returning
+                # an existing path. Pass that confirmation through to the
+                # atomic replace path instead of trying to create with xb.
+                count = self.project.export(path, overwrite=Path(path).exists())
                 messagebox.showinfo('Export abgeschlossen', f'{count} Gruppenadressen gespeichert:\n{path}\n\nIn ETS: Gruppenadressen → Rechtsklick → Gruppenadressen importieren.', parent=win)
                 win.destroy()
             except Exception as exc:
