@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from app import FilterTable, dialog_location, BG, INK
 from reverse_importer import ReverseProject, DPT_CHOICES, address, number
+from version import VERSION
 
 BASE = Path(sys.executable if getattr(sys, 'frozen', False) else __file__).resolve().parent
 BLUE = '#0879cd'
@@ -12,7 +13,7 @@ BLUE = '#0879cd'
 class ReverseApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Loxone → ETS · Gruppenadressen exportieren')
+        self.title(f'Loxone → ETS · v{VERSION}')
         self.geometry('1380x800')
         self.minsize(1100, 650)
         self.configure(background=BG)
@@ -280,7 +281,7 @@ class ReverseApp(tk.Tk):
             messagebox.showinfo('Keine Auswahl', 'Bitte mindestens eine Adresse für den Export auswählen.')
             return
         win = tk.Toplevel(self)
-        win.title('Loxone → ETS · Exportübersicht')
+        win.title('Loxone → ETS · Exportübersicht · v' + VERSION)
         win.geometry('1200x650')
         win.minsize(1000, 550)
         win.transient(self)
