@@ -1,0 +1,10 @@
+/build/
+/dist/
+/.build-deps/
+/.pyinstaller/
+/__pycache__/
+*.py[cod]
+*.Loxone
+*.xml
+*.tmp
+*.backup-*

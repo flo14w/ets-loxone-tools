@@ -1,0 +1,395 @@
+{
+  "EIBsensor:0": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:2": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "2",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Unit": "<v.m>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:3": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "3",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Unit": "<v.d>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:4": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "4",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v.d>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:5": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "5",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Unit": "<v>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:8": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "8",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:9": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "9",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:10": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "10",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBsensor:13": {
+    "attributes": {
+      "Type": "EIBsensor",
+      "V": "178",
+      "Nio": "2",
+      "WF": "16384",
+      "ValOT": "1",
+      "EIBType": "13",
+      "MaxValue": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "AQ",
+      "Q"
+    ],
+    "display": {
+      "Unit": "<v>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:0": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:1": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "1",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:2": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "2",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:3": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "3",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:4": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "4",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:5": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "5",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:6": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "6",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:8": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "8",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:9": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "9",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:10": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "10",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Type": "2",
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  },
+  "EIBactor:13": {
+    "attributes": {
+      "Type": "EIBactor",
+      "V": "178",
+      "Nio": "1",
+      "WF": "16384",
+      "EIBType": "13",
+      "SourceValHigh": "10",
+      "DestValHigh": "10"
+    },
+    "connectors": [
+      "I"
+    ],
+    "display": {
+      "Unit": "<v.1>",
+      "StateOnly": "true"
+    }
+  }
+}
