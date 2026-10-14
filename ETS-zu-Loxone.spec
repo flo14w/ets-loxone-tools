@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['reverse_app.py'],
+    ['app.py'],
     pathex=[],
     binaries=[],
-    datas=[('output/logo/loxone-ets-exporter-logo-v1.png', 'assets')],
+    datas=[('type_profiles.json', '.'), ('output/logo/ets-loxone-logo-v1.png', 'assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -22,7 +22,8 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Loxone-ETS-Exporter-v5',
+    name='ETS-zu-Loxone-v1.0.1',
+    version='version_info_ets_to_loxone.txt',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,5 +36,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['output/logo/loxone-ets-exporter-logo-v1.png'],
+    icon=['output/logo/ets-loxone-logo-v1.png'],
 )

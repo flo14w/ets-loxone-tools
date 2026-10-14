@@ -3,6 +3,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from importer import Project, load_ets, unsupported, TYPE_LABELS
+from version import VERSION
 
 BASE = Path(sys.executable if getattr(sys, 'frozen', False) else __file__).resolve().parent
 GREEN, BG, INK = '#69b329', '#f1f2f3', '#33383c'
@@ -126,7 +127,7 @@ class FilterTable(ttk.Frame):
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('ETS → Loxone Importer')
+        self.title(f'ETS → Loxone · v{VERSION}')
         self.geometry('1380x860')
         self.minsize(1100, 720)
         self.configure(background=BG)
