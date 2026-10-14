@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Loxone-zu-ETS-v1.0.1',
+    name='Loxone-zu-ETS-v1.0.2',
     version='version_info_loxone_to_ets.txt',
     debug=False,
     bootloader_ignore_signals=False,
