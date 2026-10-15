@@ -10,7 +10,7 @@ NS = 'http://knx.org/xml/ga-export/01'
 TYPE_DPTS = {0: ('DPT-1',), 1: ('DPT-3',), 2: ('DPT-10',), 3: ('DPT-11',),
              4: ('DPT-9',), 5: ('DPST-5-1',), 6: ('DPT-1',), 8: ('DPT-14',),
              9: ('DPT-7', 'DPT-8'), 10: ('DPT-12', 'DPT-13'), 13: ('DPT-5', 'DPT-6')}
-DPT_CHOICES = ['DPT-1', 'DPT-3', 'DPT-5', 'DPST-5-1', 'DPST-5-10', 'DPT-6', 'DPT-7', 'DPT-8', 'DPT-9', 'DPT-10', 'DPT-11', 'DPT-12', 'DPT-13', 'DPT-14']
+DPT_CHOICES = ['DPT-1', 'DPT-3', 'DPT-5', 'DPT-6', 'DPT-7', 'DPT-8', 'DPT-9', 'DPT-10', 'DPT-11', 'DPT-12', 'DPT-13', 'DPT-14']
 
 
 def number(ga):

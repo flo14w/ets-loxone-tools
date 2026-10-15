@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-from app import FilterTable, dialog_location, BG, INK
+from app import FilterTable, dialog_location, position_popup, BG, INK
 from reverse_importer import ReverseProject, DPT_CHOICES, address, number
 from version import VERSION
 
@@ -61,7 +61,7 @@ class ReverseApp(tk.Tk):
         ttk.Button(footer, text='Filter zurücksetzen', command=lambda: self.table.reset()).pack(side='left', padx=8)
         ttk.Button(footer, text='Lesehinweise …', command=self.notes).pack(side='left')
         ttk.Button(footer, text='Weiter: Exportübersicht →', style='Accent.TButton', command=self.review).pack(side='right')
-        self.table = FilterTable(self, ('Export', 'ETS-Adresse', 'Loxone-Adresse', 'Name', 'ETS-DPT', 'Funktion', 'Kategorie', 'Raum', 'Quelle', 'Prüfung'), (75, 110, 120, 240, 130, 120, 160, 160, 180, 330))
+        self.table = FilterTable(self, ('Export', 'ETS-Adresse', 'Loxone-Adresse', 'Name', 'ETS-DPT', 'Hauptgruppe', 'Mittelgruppe', 'Prüfung'), (75, 110, 120, 240, 130, 190, 190, 330))
         self.table.pack(fill='both', expand=True, padx=16)
         self.table.tree.bind('<Double-1>', lambda e: self.edit() if self.table.tree.identify_region(e.x, e.y) in ('cell', 'tree') else None)
         files = list(BASE.glob('*.Loxone')) or list(BASE.parent.glob('*.Loxone'))
@@ -70,7 +70,7 @@ class ReverseApp(tk.Tk):
             self.path.set(str(files[0]))
 
     def pick(self):
-        chosen = filedialog.askopenfilename(**dialog_location(self.path.get()), filetypes=[('Loxone Config', '*.Loxone')])
+        chosen = filedialog.askopenfilename(parent=self, **dialog_location(self.path.get()), filetypes=[('Loxone Config', '*.Loxone')])
         if chosen:
             self.path.set(chosen)
 
@@ -88,7 +88,11 @@ class ReverseApp(tk.Tk):
         if not self.project:
             return
         issues = {id(row): issue for row, issue in self.project.issues()}
-        self.table.set_data([(i, ('Ja' if r.selected else 'Nein', r.ga, r.original_ga, r.name, 'Ohne DPT' if r.omit_dpt or not r.dpt else r.dpt, r.functions, r.category, r.room, r.source, issues.get(id(r)) or r.note or 'Bereit'), ('warning',) if issues.get(id(r)) else ()) for i, r in enumerate(self.project.rows)])
+        self.project.ensure_groups()
+        self.table.set_data([(i, ('Ja' if r.selected else 'Nein', r.ga, r.original_ga, r.name, 'Ohne DPT' if r.omit_dpt or not r.dpt else r.dpt,
+            self.project.main_names.get(int(r.ga.split('/')[0]), ''),
+            self.project.middle_names.get(tuple(map(int, r.ga.split('/')[:2])), ''),
+            issues.get(id(r)) or r.note or 'Bereit'), ('warning',) if issues.get(id(r)) else ()) for i, r in enumerate(self.project.rows)])
         chosen = sum(r.selected for r in self.project.rows)
         errors = sum(bool(issue) for issue in issues.values())
         self.status.set(f'{self.project.source_count} KNX-Objekte · {len(self.project.rows)} Einträge nach Name/Adresse · {chosen} ausgewählt · {errors} zu klären · {len(self.project.read_notes())} Lesehinweise')
@@ -104,6 +108,8 @@ class ReverseApp(tk.Tk):
             win = tk.Toplevel(self)
             win.title('Lesehinweise')
             win.geometry('850x400')
+            win.transient(self)
+            position_popup(win, self, 850, 400)
             frame = ttk.Frame(win, padding=16)
             frame.pack(fill='both', expand=True)
             text = tk.Text(frame, wrap='word', font=('Segoe UI', 10))
@@ -123,6 +129,7 @@ class ReverseApp(tk.Tk):
         win.geometry('700x450')
         win.minsize(650, 450)
         win.transient(self)
+        position_popup(win, self, 700, 450)
         win.grab_set()
         box = ttk.Frame(win, padding=18)
         box.pack(fill='both', expand=True)
@@ -171,15 +178,20 @@ class ReverseApp(tk.Tk):
         rows = [self.project.rows[int(i)] for i in self.table.tree.get_children() if i in ids]
         win = tk.Toplevel(self)
         win.title('ETS-Adressen fortlaufend vergeben')
-        win.geometry('650x340')
-        win.minsize(650, 340)
+        win.geometry('760x420')
+        win.minsize(700, 400)
         win.transient(self)
+        position_popup(win, self, 760, 420)
         win.grab_set()
         box = ttk.Frame(win, padding=18)
         box.pack(fill='both', expand=True)
         ttk.Label(box, text=f'{len(rows)} markierte Einträge neu adressieren', font=('Segoe UI', 14, 'bold')).pack(anchor='w')
         main, middle, _ = rows[0].ga.split('/')
         values = [tk.StringVar(value=main), tk.StringVar(value=middle), tk.StringVar(value='1')]
+        group_names = [
+            tk.StringVar(value=self.project.main_names.get(int(main), '')),
+            tk.StringVar(value=self.project.middle_names.get((int(main), int(middle)), '')),
+        ]
         fields = ttk.Frame(box)
         fields.pack(fill='x', pady=12)
         for column, (label, maximum, value) in enumerate(zip(
@@ -188,6 +200,50 @@ class ReverseApp(tk.Tk):
             ttk.Label(fields, text=label).grid(row=0, column=column, sticky='w', padx=6)
             ttk.Spinbox(fields, from_=0, to=maximum, textvariable=value, width=18).grid(row=1, column=column, sticky='ew', padx=6)
             fields.columnconfigure(column, weight=1)
+        name_fields = ttk.Frame(box)
+        name_fields.pack(fill='x', pady=(0, 6))
+        for column, (label, value) in enumerate(zip(('Name der Hauptgruppe', 'Name der Mittelgruppe'), group_names)):
+            ttk.Label(name_fields, text=label).grid(row=0, column=column, sticky='w', padx=6)
+            ttk.Entry(name_fields, textvariable=value).grid(row=1, column=column, sticky='ew', padx=6)
+            name_fields.columnconfigure(column, weight=1)
+
+        def remember_main_name(*_):
+            try:
+                main_id = int(values[0].get())
+            except ValueError:
+                return
+            name = group_names[0].get().strip()
+            if name:
+                self.project.main_names[main_id] = name
+
+        def remember_middle_name(*_):
+            try:
+                key = (int(values[0].get()), int(values[1].get()))
+            except ValueError:
+                return
+            name = group_names[1].get().strip()
+            if name:
+                self.project.middle_names[key] = name
+
+        def load_main_name(*_):
+            try:
+                main_id = int(values[0].get())
+            except ValueError:
+                return
+            group_names[0].set(self.project.main_names.get(main_id, ''))
+
+        def load_middle_name(*_):
+            try:
+                key = (int(values[0].get()), int(values[1].get()))
+            except ValueError:
+                return
+            group_names[1].set(self.project.middle_names.get(key, ''))
+
+        group_names[0].trace_add('write', remember_main_name)
+        group_names[1].trace_add('write', remember_middle_name)
+        values[0].trace_add('write', load_main_name)
+        values[0].trace_add('write', load_middle_name)
+        values[1].trace_add('write', load_middle_name)
         ttk.Label(box, text='Vergabe aufsteigend in Tabellenreihenfolge, nur innerhalb der gewählten Haupt- und Mittelgruppe. Belegte Adressen anderer Einträge werden übersprungen.\nDie Loxone-Datei wird nicht geändert; neue ETS-Adressen sind dort separat abzugleichen.', wraplength=600).pack(anchor='w', pady=12)
 
         def apply():
@@ -195,7 +251,12 @@ class ReverseApp(tk.Tk):
                 parts = [value.get().strip() for value in values]
                 if any(not part.isascii() or not part.isdigit() for part in parts) or any(int(part) > limit for part, limit in zip(parts, (31, 7, 255))):
                     raise ValueError('Bitte Hauptgruppe 0–31, Mittelgruppe 0–7 und Start-Untergruppe 0–255 eingeben.')
+                main_id, middle_id = int(parts[0]), int(parts[1])
                 self.project.renumber(rows, '/'.join(parts), within_group=True)
+                if group_names[0].get().strip():
+                    self.project.main_names[main_id] = group_names[0].get().strip()
+                if group_names[1].get().strip():
+                    self.project.middle_names[(main_id, middle_id)] = group_names[1].get().strip()
                 self.refresh()
                 win.destroy()
             except ValueError as exc:
@@ -211,6 +272,7 @@ class ReverseApp(tk.Tk):
         win.geometry('750x550')
         win.minsize(650, 420)
         win.transient(self)
+        position_popup(win, self, 750, 550)
         win.grab_set()
         ttk.Label(win, text='Namen direkt anklicken und bearbeiten · Enter: übernehmen · Esc: verwerfen', padding=16).pack(anchor='w')
         foot = ttk.Frame(win, padding=16)
@@ -285,6 +347,7 @@ class ReverseApp(tk.Tk):
         win.geometry('1200x650')
         win.minsize(1000, 550)
         win.transient(self)
+        position_popup(win, self, 1200, 650)
         win.grab_set()
         errors = sum(bool(issue) for _, issue in plan)
         missing = sum(r.omit_dpt or not r.dpt for r, _ in plan)

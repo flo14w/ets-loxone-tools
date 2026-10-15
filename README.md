@@ -9,7 +9,7 @@ Die Anwendungen laufen lokal unter Windows. Sie verbinden sich nicht mit einem L
 
 ## Windows-Programme herunterladen und starten
 
-Die fertigen Windows-Programme liegen als Downloads im [GitHub-Bereich „Releases“](https://github.com/flo14w/ets-loxone-tools/releases), nicht im Quellcode-Repository. Lade dort `ETS-zu-Loxone-v1.0.2.exe` oder `Loxone-zu-ETS-v1.0.2.exe` herunter und starte die passende EXE direkt. `dist` wird erst beim lokalen Build angelegt und ist deshalb im Repository nicht vorhanden.
+Die fertigen Windows-Programme liegen als Downloads im [GitHub-Bereich „Releases“](https://github.com/flo14w/ets-loxone-tools/releases), nicht im Quellcode-Repository. Lade dort `ETS-zu-Loxone-v1.0.7.exe` oder `Loxone-zu-ETS-v1.0.7.exe` herunter und starte die passende EXE direkt. `dist` wird erst beim lokalen Build angelegt und ist deshalb im Repository nicht vorhanden.
 
 Die Startskripte starten eine heruntergeladene EXE neben dem Skript oder eine lokal gebaute EXE in `dist`. Andernfalls starten sie den Quellcode mit Python 3.11 und Tkinter. `Start-ETS-zu-Loxone.cmd` öffnet ETS → Loxone; `Start-Loxone-zu-ETS.cmd` öffnet Loxone → ETS.
 

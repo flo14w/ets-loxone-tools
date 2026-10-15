@@ -17,6 +17,55 @@ def dialog_location(value):
     return {'initialdir': str(directory.resolve())}
 
 
+def position_popup(window, owner, width, height):
+    owner.update_idletasks()
+    window.update_idletasks()
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class Rect(ctypes.Structure):
+            _fields_ = [('left', wintypes.LONG), ('top', wintypes.LONG), ('right', wintypes.LONG), ('bottom', wintypes.LONG)]
+
+        class MonitorInfo(ctypes.Structure):
+            _fields_ = [('size', wintypes.DWORD), ('monitor', Rect), ('work', Rect), ('flags', wintypes.DWORD)]
+
+        user32 = ctypes.windll.user32
+        user32.GetWindowRect.argtypes = (wintypes.HWND, ctypes.POINTER(Rect))
+        user32.GetWindowRect.restype = wintypes.BOOL
+        user32.MonitorFromWindow.argtypes = (wintypes.HWND, wintypes.DWORD)
+        user32.MonitorFromWindow.restype = ctypes.c_void_p
+        user32.GetMonitorInfoW.argtypes = (ctypes.c_void_p, ctypes.POINTER(MonitorInfo))
+        user32.GetMonitorInfoW.restype = wintypes.BOOL
+        user32.SetWindowPos.argtypes = (wintypes.HWND, wintypes.HWND, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, wintypes.UINT)
+        user32.SetWindowPos.restype = wintypes.BOOL
+        owner_hwnd = int(owner.wm_frame(), 0)
+        window_hwnd = int(window.wm_frame(), 0)
+        owner_rect, window_rect = Rect(), Rect()
+        if not user32.GetWindowRect(owner_hwnd, ctypes.byref(owner_rect)) or not user32.GetWindowRect(window_hwnd, ctypes.byref(window_rect)):
+            raise OSError('Windows-Fensterrahmen konnten nicht gelesen werden.')
+        monitor = user32.MonitorFromWindow(owner_hwnd, 2)
+        info = MonitorInfo()
+        info.size = ctypes.sizeof(info)
+        if monitor and user32.GetMonitorInfoW(monitor, ctypes.byref(info)):
+            work = info.work
+            window_width = window_rect.right - window_rect.left
+            window_height = window_rect.bottom - window_rect.top
+            owner_width = owner_rect.right - owner_rect.left
+            owner_height = owner_rect.bottom - owner_rect.top
+            x = owner_rect.left + (owner_width - window_width) // 2
+            y = owner_rect.top + (owner_height - window_height) // 2
+            x = min(max(x, work.left), max(work.left, work.right - window_width))
+            y = min(max(y, work.top), max(work.top, work.bottom - window_height))
+            user32.SetWindowPos(window_hwnd, None, x, y, 0, 0, 0x0015)
+        else:
+            raise OSError('Zugehöriger Monitor konnte nicht ermittelt werden.')
+    except (AttributeError, OSError):
+        x = owner.winfo_rootx() + max(0, (owner.winfo_width() - width) // 2)
+        y = owner.winfo_rooty() + max(0, (owner.winfo_height() - height) // 2)
+        window.geometry(f'{width}x{height}+{max(0, x)}+{max(0, y)}')
+
+
 class FilterTable(ttk.Frame):
     def __init__(self, parent, columns, widths):
         super().__init__(parent)
@@ -31,11 +80,9 @@ class FilterTable(ttk.Frame):
         self.tree.tag_configure('warning', foreground='#a25b00')
         self.tree.tag_configure('odd', background='#f3f6f0')
         vs = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
-        hs = ttk.Scrollbar(self, orient='horizontal', command=self.tree.xview)
-        self.tree.configure(yscrollcommand=vs.set, xscrollcommand=hs.set)
+        self.tree.configure(yscrollcommand=vs.set)
         self.tree.grid(row=0, column=0, sticky='nsew')
         vs.grid(row=0, column=1, sticky='ns')
-        hs.grid(row=1, column=0, sticky='ew')
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
@@ -70,6 +117,7 @@ class FilterTable(ttk.Frame):
         win.title('Filter · ' + col)
         win.geometry('480x500')
         win.transient(self.winfo_toplevel())
+        position_popup(win, self.winfo_toplevel(), 480, 500)
         win.grab_set()
         box = ttk.Frame(win, padding=16)
         box.pack(fill='both', expand=True)
@@ -137,6 +185,7 @@ class App(tk.Tk):
         self.status = tk.StringVar(value='ETS-Export und Loxone-Projekt laden.')
         self.type_vars, self.role_tables = {}, {}
         self.allocation_widgets = []
+        self.allocation_refresh_callbacks = []
         style = ttk.Style(self)
         style.theme_use('clam')
         style.configure('.', font=('Segoe UI', 10), background=BG, foreground=INK)
@@ -182,11 +231,10 @@ class App(tk.Tk):
         ttk.Label(bar, text='Funktion für markierte Adressen:').pack(side='left')
         ttk.Combobox(bar, textvariable=self.function, values=['Sensor', 'Aktor', 'Nicht importieren'], state='readonly', width=19).pack(side='left', padx=8)
         ttk.Button(bar, text='Funktion übernehmen', command=self.assign_function).pack(side='left')
-        ttk.Button(bar, text='Weiter: Datentypen →', style='Accent.TButton', command=lambda: self.tabs.select(types) if self.project else None).pack(side='right')
         ttk.Label(overview, text='Spaltenkopf anklicken zum Filtern · Filter werden kombiniert · Dimmen EIS2 (DPT3) wird automatisch als Aktor eingeordnet.').pack(anchor='w', pady=(0, 8))
         self.overview = FilterTable(overview, ('Adresse', 'Name', 'ETS-DPT', 'Gruppe', 'Funktion', 'Status'), (100, 290, 125, 290, 120, 230))
         self.overview.pack(fill='both', expand=True)
-        self.table_actions(overview, self.overview)
+        self.table_actions(overview, self.overview, ('Weiter: Datentypen →', lambda: self.tabs.select(types) if self.project else None))
         self.role_tabs = ttk.Notebook(types)
         self.role_tabs.pack(fill='both', expand=True)
         for role in ('Sensor', 'Aktor'):
@@ -200,11 +248,11 @@ class App(tk.Tk):
             labels = [v for k, v in TYPE_LABELS.items() if role == 'Aktor' or k != 1]
             ttk.Combobox(controls, textvariable=var, values=labels, state='readonly', width=41).pack(side='left', padx=8)
             ttk.Button(controls, text='Typ übernehmen', command=lambda r=role: self.assign_type(r)).pack(side='left')
-            ttk.Label(page, text='Typ aus ETS-DPT voreingestellt · Mehrfachauswahl mit Strg/Shift oder „Sichtbare markieren“.').pack(anchor='w', pady=(0, 8))
+            ttk.Label(page, text='Typ aus ETS-DPT voreingestellt · Mehrfachauswahl mit Strg/Shift.').pack(anchor='w', pady=(0, 8))
             table = FilterTable(page, ('Adresse', 'Name', 'ETS-DPT', 'Gruppe', 'Funktion', 'Loxone-Typ', 'Kategorie', 'Raum', 'Status'), (90, 230, 110, 200, 90, 280, 170, 170, 180))
             table.pack(fill='both', expand=True)
             self.allocation_controls(page, table, self.refresh)
-            table.tree.bind('<<TreeviewSelect>>', lambda _, r=role: self.select_type(r))
+            table.tree.bind('<<TreeviewSelect>>', lambda _, r=role: self.select_type(r), add='+')
             self.role_tables[role] = table
             self.table_actions(page, table)
         foot = ttk.Frame(types)
@@ -218,11 +266,13 @@ class App(tk.Tk):
             if matches:
                 var.set(str(matches[0]))
 
-    def table_actions(self, parent, table):
+    def table_actions(self, parent, table, next_action=None):
         bar = ttk.Frame(parent)
         bar.pack(side='bottom', before=table, fill='x', pady=(8, 0))
-        ttk.Button(bar, text='Sichtbare markieren', command=table.mark_all).pack(side='left')
-        ttk.Button(bar, text='Alle Filter zurücksetzen', command=table.reset).pack(side='left', padx=8)
+        ttk.Button(bar, text='Alle Filter zurücksetzen', command=table.reset).pack(side='left')
+        if next_action:
+            text, command = next_action
+            ttk.Button(bar, text=text, style='Accent.TButton', command=command).pack(side='right')
 
     def allocation_controls(self, parent, table, changed):
         bar = ttk.Frame(parent)
@@ -251,6 +301,20 @@ class App(tk.Tk):
 
         ttk.Button(bar, text='Markierten zuweisen', command=apply).grid(row=0, column=4)
         self.allocation_widgets.append((cat_box, room_box, category, room))
+        def show_current(_event=None):
+            selected = table.tree.selection()
+            if not selected or not self.project:
+                category.set('Unverändert')
+                room.set('Unverändert')
+                return
+            row = self.rows[int(selected[0])]
+            cats = self.allocation_options(self.project.categories)
+            rooms = self.allocation_options(self.project.rooms)
+            category.set(next((label for label, uid in cats.items() if uid == row.category_id), 'Keine Zuordnung'))
+            room.set(next((label for label, uid in rooms.items() if uid == row.room_id), 'Keine Zuordnung'))
+
+        table.tree.bind('<<TreeviewSelect>>', show_current, add='+')
+        self.allocation_refresh_callbacks.append(show_current)
         self.update_allocation_options()
 
     @staticmethod
@@ -269,7 +333,7 @@ class App(tk.Tk):
             room_box['values'] = ['Unverändert', *self.allocation_options(self.project.rooms if self.project else {})]
 
     def pick(self, var, extension):
-        path = filedialog.askopenfilename(**dialog_location(var.get()), filetypes=[('Projektdatei', extension), ('Alle Dateien', '*.*')])
+        path = filedialog.askopenfilename(parent=self, **dialog_location(var.get()), filetypes=[('Projektdatei', extension), ('Alle Dateien', '*.*')])
         if path:
             var.set(path)
 
@@ -312,6 +376,8 @@ class App(tk.Tk):
         for i, (role, data) in enumerate(role_data.items()):
             self.role_tables[role].set_data(data)
             self.role_tabs.tab(i, text=f'{"Sensoren" if role == "Sensor" else "Aktoren"} ({len(data)})')
+        for update_controls in self.allocation_refresh_callbacks:
+            update_controls()
         self.status.set(f'{len(self.rows)} Adressen  ·  {len(role_data["Sensor"])} Sensoren  ·  {len(role_data["Aktor"])} Aktoren  ·  {sum(not r.dpt for r in self.rows)} ohne ETS-DPT  ·  {sum(unsupported(r.dpt) for r in self.rows)} nicht unterstützt')
 
     def assign_function(self):
@@ -348,6 +414,7 @@ class App(tk.Tk):
         win.geometry('1280x700')
         win.minsize(1000, 600)
         win.transient(self)
+        position_popup(win, self, 1280, 700)
         win.grab_set()
         errors = sum(bool(issue) for _, issue in plan)
         summary = tk.StringVar()
@@ -382,7 +449,6 @@ class App(tk.Tk):
 
         ttk.Checkbutton(foot, text='Funktionen, Datentypen, Kategorien und Räume geprüft', variable=confirmed, command=enable).pack(anchor='w')
         ttk.Label(foot, text='Aktuelle Datei: gleiche Namen aktualisieren, neue Namen anlegen. Vorher wird eine Sicherungskopie erstellt.').pack(anchor='w')
-        self.allocation_controls(win, table, refresh_review)
         refresh_review()
 
     def save(self, win, current=False):

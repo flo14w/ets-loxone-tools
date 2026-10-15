@@ -15,12 +15,12 @@ VSVersionInfo(
         '040704B0',
         [StringStruct('CompanyName', 'flo14w'),
          StringStruct('FileDescription', 'Loxone zu ETS - KNX-Gruppenadressen'),
-         StringStruct('FileVersion', '1.0.2'),
+         StringStruct('FileVersion', '1.0.7'),
          StringStruct('InternalName', 'Loxone-zu-ETS'),
          StringStruct('LegalCopyright', 'Copyright 2026 flo14w'),
-         StringStruct('OriginalFilename', 'Loxone-zu-ETS-v1.0.2.exe'),
+         StringStruct('OriginalFilename', 'Loxone-zu-ETS-v1.0.7.exe'),
          StringStruct('ProductName', 'ETS ↔ Loxone KNX-Werkzeuge'),
-         StringStruct('ProductVersion', '1.0.2')]
+         StringStruct('ProductVersion', '1.0.7')]
       )
     ]),
     VarFileInfo([VarStruct('Translation', [1031, 1200])])
