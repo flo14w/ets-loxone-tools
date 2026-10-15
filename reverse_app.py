@@ -10,18 +10,22 @@ BASE = Path(sys.executable if getattr(sys, 'frozen', False) else __file__).resol
 BLUE = '#0879cd'
 
 
-class ReverseApp(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title(f'Loxone → ETS · v{VERSION}')
-        self.geometry('1380x800')
-        self.minsize(1100, 650)
+class ReverseApp(tk.Frame):
+    def __init__(self, parent=None):
+        self._owns_root = parent is None
+        if parent is None:
+            parent = tk.Tk()
+            parent.title(f'Loxone → ETS · v{VERSION}')
+            parent.geometry('1380x800')
+            parent.minsize(1100, 650)
+        super().__init__(parent, background=BG)
         self.configure(background=BG)
         self.project = None
         self.path = tk.StringVar()
         self.status = tk.StringVar(value='Loxone-Datei auswählen und KNX-Adressen einlesen.')
         style = ttk.Style(self)
-        style.theme_use('clam')
+        if style.theme_use() != 'clam':
+            style.theme_use('clam')
         style.configure('.', font=('Segoe UI', 10), background=BG, foreground=INK)
         style.configure('TButton', padding=(12, 7))
         style.configure('Accent.TButton', background=BLUE, foreground='white', font=('Segoe UI', 10, 'bold'))
@@ -31,11 +35,11 @@ class ReverseApp(tk.Tk):
         style.configure('Treeview.Heading', font=('Segoe UI', 10, 'bold'), padding=(6, 8))
         banner = tk.Frame(self, background='#293944', padx=18, pady=12)
         banner.pack(fill='x')
-        logo = Path(sys._MEIPASS) / 'assets' / 'loxone-ets-exporter-logo-v1.png' if getattr(sys, 'frozen', False) else BASE / 'output/logo/loxone-ets-exporter-logo-v1.png'
-        raw = tk.PhotoImage(file=str(logo))
+        logo = Path(sys._MEIPASS) / 'assets' / 'loxone-ets-exporter-logo-bidirectional-v2.png' if getattr(sys, 'frozen', False) else BASE / 'output/logo/loxone-ets-exporter-logo-bidirectional-v2.png'
+        raw = tk.PhotoImage(master=self, file=str(logo))
         factor = max(1, (max(raw.width(), raw.height()) + 63) // 64)
         self.logo = raw.subsample(factor, factor)
-        self.iconphoto(True, self.logo)
+        self.winfo_toplevel().iconphoto(True, self.logo)
         tk.Label(banner, image=self.logo, background='#293944').pack(side='left', padx=(0, 12))
         tk.Label(banner, text='LOXONE  →  ETS', font=('Segoe UI', 22, 'bold'), background='#293944', foreground='white').pack(side='left')
         tk.Label(banner, text='GRUPPENADRESSEN ALS ETS-XML EXPORTIEREN', background='#293944', foreground='#b1d9f5').pack(side='right')
@@ -68,6 +72,44 @@ class ReverseApp(tk.Tk):
         files.sort(key=lambda p: ('.backup-' in p.name.casefold(), 'typvorlagen' in p.name.casefold(), p.name.casefold()))
         if files:
             self.path.set(str(files[0]))
+        if self._owns_root:
+            self.pack(fill='both', expand=True)
+
+    def activate(self):
+        style = ttk.Style(self)
+        if style.theme_use() != 'clam':
+            style.theme_use('clam')
+        style.configure('.', font=('Segoe UI', 10), background=BG, foreground=INK)
+        style.configure('TButton', padding=(12, 7))
+        style.configure('Accent.TButton', background=BLUE, foreground='white', font=('Segoe UI', 10, 'bold'))
+        style.map('Accent.TButton', background=[('active', '#0567b0'), ('disabled', '#9dafbf')])
+        style.configure('Treeview', rowheight=29, background='white', fieldbackground='white')
+        style.map('Treeview', background=[('selected', '#cfe6f7')], foreground=[('selected', '#18354a')])
+        style.configure('Treeview.Heading', font=('Segoe UI', 10, 'bold'), padding=(6, 8))
+
+    def withdraw(self):
+        self.winfo_toplevel().withdraw()
+
+    def deiconify(self):
+        self.winfo_toplevel().deiconify()
+
+    def update(self):
+        self.winfo_toplevel().update()
+
+    def geometry(self, value=None):
+        return self.winfo_toplevel().geometry(value) if value is not None else self.winfo_toplevel().geometry()
+
+    def wm_frame(self):
+        return self.winfo_toplevel().wm_frame()
+
+    def mainloop(self, *args, **kwargs):
+        return self.winfo_toplevel().mainloop(*args, **kwargs)
+
+    def destroy(self):
+        root = self.winfo_toplevel()
+        super().destroy()
+        if self._owns_root:
+            root.destroy()
 
     def pick(self):
         chosen = filedialog.askopenfilename(parent=self, **dialog_location(self.path.get()), filetypes=[('Loxone Config', '*.Loxone')])
@@ -379,4 +421,11 @@ class ReverseApp(tk.Tk):
 
 
 if __name__ == '__main__':
-    ReverseApp().mainloop()
+    root = tk.Tk()
+    root.title(f'Loxone → ETS · v{VERSION}')
+    root.geometry('1380x800')
+    root.minsize(1100, 650)
+    app = ReverseApp(root)
+    app.pack(fill='both', expand=True)
+    root.iconphoto(True, app.logo)
+    root.mainloop()

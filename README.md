@@ -1,6 +1,6 @@
 # ETS ↔ Loxone KNX-Werkzeuge
 
-Zwei eigenständige Windows-Desktopprogramme für den Austausch von KNX-Gruppenadressen mit Loxone Config:
+Ein Windows-Desktopprogramm mit zwei umschaltbaren Bereichen. Die beiden bisherigen Arbeitsoberflächen bleiben in eigenen Reitern erhalten; beim Start ist **ETS → Loxone** ausgewählt.
 
 - **ETS → Loxone:** ETS-Gruppenadressen-XML einlesen, Sensoren/Aktoren und Datentypen zuordnen, Kategorien und Räume prüfen und in eine neue oder bestehende Loxone-Datei importieren.
 - **Loxone → ETS:** KNX-Objekte aus einer Loxone-Datei auslesen, Adressen und Datentypen prüfen und als ETS-Gruppenadressen-XML exportieren.
@@ -9,16 +9,16 @@ Die Anwendungen laufen lokal unter Windows. Sie verbinden sich nicht mit einem L
 
 ## Windows-Programme herunterladen und starten
 
-Die fertigen Windows-Programme liegen als Downloads im [GitHub-Bereich „Releases“](https://github.com/flo14w/ets-loxone-tools/releases), nicht im Quellcode-Repository. Lade dort `ETS-zu-Loxone-v1.0.7.exe` oder `Loxone-zu-ETS-v1.0.7.exe` herunter und starte die passende EXE direkt. `dist` wird erst beim lokalen Build angelegt und ist deshalb im Repository nicht vorhanden.
+Die fertigen Windows-Programme liegen als Downloads im [GitHub-Bereich „Releases“](https://github.com/flo14w/ets-loxone-tools/releases), nicht im Quellcode-Repository. Lade die gemeinsame Anwendung `ETS-Loxone-KNX-Werkzeuge-v1.0.8.exe` herunter.
 
-Die Startskripte starten eine heruntergeladene EXE neben dem Skript oder eine lokal gebaute EXE in `dist`. Andernfalls starten sie den Quellcode mit Python 3.11 und Tkinter. `Start-ETS-zu-Loxone.cmd` öffnet ETS → Loxone; `Start-Loxone-zu-ETS.cmd` öffnet Loxone → ETS.
+`Start-ETS-Loxone-KNX.cmd` startet die gemeinsame EXE neben dem Skript oder eine lokal gebaute EXE in `dist`. Wenn noch keine EXE vorhanden ist, startet es den Quellcode mit Python 3.11 und Tkinter. Die bisherigen Startskripte für die einzelnen Anwendungen bleiben verfügbar.
 
 ## Dokumentation und Build
 
 - [ETS → Loxone](README-ETS-zu-Loxone.md)
 - [Loxone → ETS](README-Loxone-zu-ETS.md)
 
-Die `.spec`-Dateien bauen beide Programme mit PyInstaller. Beide EXEs und Fenstertitel beziehen ihre Produktversion aus `version.py`; Windows-Dateieigenschaften und Release-Dateinamen verwenden dieselbe Version. `requirements-build.txt` enthält die Build-Abhängigkeit.
+`ETS-Loxone-KNX-Werkzeuge.spec` baut das gemeinsame Programm mit PyInstaller. Die bisherigen `.spec`-Dateien für die einzelnen Anwendungen bleiben als ältere Build-Varianten erhalten. Fenstertitel beziehen ihre Produktversion aus `version.py`; Windows-Dateieigenschaften und EXE-Dateinamen verwenden dieselbe Version. `requirements-build.txt` enthält die Build-Abhängigkeit.
 
 ## Mitwirkung und Logo
 

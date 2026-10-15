@@ -172,12 +172,15 @@ class FilterTable(ttk.Frame):
         redraw()
 
 
-class App(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title(f'ETS → Loxone · v{VERSION}')
-        self.geometry('1380x860')
-        self.minsize(1100, 720)
+class App(tk.Frame):
+    def __init__(self, parent=None):
+        self._owns_root = parent is None
+        if parent is None:
+            parent = tk.Tk()
+            parent.title(f'ETS → Loxone · v{VERSION}')
+            parent.geometry('1380x860')
+            parent.minsize(1100, 720)
+        super().__init__(parent, background=BG)
         self.configure(background=BG)
         self.rows, self.project = [], None
         self.ets, self.lox, self.target = [tk.StringVar() for _ in range(3)]
@@ -186,24 +189,14 @@ class App(tk.Tk):
         self.type_vars, self.role_tables = {}, {}
         self.allocation_widgets = []
         self.allocation_refresh_callbacks = []
-        style = ttk.Style(self)
-        style.theme_use('clam')
-        style.configure('.', font=('Segoe UI', 10), background=BG, foreground=INK)
-        style.configure('TButton', padding=(12, 7))
-        style.configure('Accent.TButton', background=GREEN, foreground='white', font=('Segoe UI', 10, 'bold'))
-        style.map('Accent.TButton', background=[('active', '#559624'), ('disabled', '#bdcbb4')])
-        style.configure('Treeview', rowheight=29, background='white', fieldbackground='white', borderwidth=0)
-        style.map('Treeview', background=[('selected', '#d9ebcb')], foreground=[('selected', '#243b18')])
-        style.configure('Treeview.Heading', background='#e1e4e6', font=('Segoe UI', 10, 'bold'), padding=(6, 9))
-        style.configure('TNotebook.Tab', padding=(22, 10))
-        style.map('TNotebook.Tab', background=[('selected', 'white')], foreground=[('selected', '#4c8c20')])
+        self._configure_style()
         banner = tk.Frame(self, background='#353a3e', padx=20, pady=14)
         banner.pack(fill='x')
-        logo_path = (Path(sys._MEIPASS) / 'assets' / 'ets-loxone-logo-v1.png') if getattr(sys, 'frozen', False) else BASE / 'output' / 'logo' / 'ets-loxone-logo-v1.png'
-        original_logo = tk.PhotoImage(file=str(logo_path))
+        logo_path = (Path(sys._MEIPASS) / 'assets' / 'loxone-ets-exporter-logo-bidirectional-v2.png') if getattr(sys, 'frozen', False) else BASE / 'output' / 'logo' / 'loxone-ets-exporter-logo-bidirectional-v2.png'
+        original_logo = tk.PhotoImage(master=self, file=str(logo_path))
         factor = max(1, (max(original_logo.width(), original_logo.height()) + 63) // 64)
         self.logo = original_logo.subsample(factor, factor)
-        self.iconphoto(True, self.logo)
+        self.winfo_toplevel().iconphoto(True, self.logo)
         tk.Label(banner, image=self.logo, background='#353a3e').pack(side='left', padx=(0, 12))
         tk.Label(banner, text='ETS  →  LOXONE', font=('Segoe UI', 21, 'bold'), foreground='white', background='#353a3e').pack(side='left')
         tk.Label(banner, text='KNX GRUPPENADRESSEN IMPORTIEREN', font=('Segoe UI', 10), foreground='#b9dca3', background='#353a3e').pack(side='right')
@@ -265,6 +258,48 @@ class App(tk.Tk):
             matches.sort(key=lambda p: ('.backup-' in p.name.casefold(), 'typvorlagen' in p.name.casefold(), p.name.casefold()))
             if matches:
                 var.set(str(matches[0]))
+        if self._owns_root:
+            self.pack(fill='both', expand=True)
+
+    def _configure_style(self):
+        style = ttk.Style(self)
+        if style.theme_use() != 'clam':
+            style.theme_use('clam')
+        style.configure('.', font=('Segoe UI', 10), background=BG, foreground=INK)
+        style.configure('TButton', padding=(12, 7))
+        style.configure('Accent.TButton', background=GREEN, foreground='white', font=('Segoe UI', 10, 'bold'))
+        style.map('Accent.TButton', background=[('active', '#559624'), ('disabled', '#bdcbb4')])
+        style.configure('Treeview', rowheight=29, background='white', fieldbackground='white', borderwidth=0)
+        style.map('Treeview', background=[('selected', '#d9ebcb')], foreground=[('selected', '#243b18')])
+        style.configure('Treeview.Heading', background='#e1e4e6', font=('Segoe UI', 10, 'bold'), padding=(6, 9))
+        style.configure('TNotebook.Tab', padding=(22, 10))
+        style.map('TNotebook.Tab', background=[('selected', 'white')], foreground=[('selected', '#4c8c20')])
+    def activate(self):
+        self._configure_style()
+
+    def withdraw(self):
+        self.winfo_toplevel().withdraw()
+
+    def deiconify(self):
+        self.winfo_toplevel().deiconify()
+
+    def update(self):
+        self.winfo_toplevel().update()
+
+    def geometry(self, value=None):
+        return self.winfo_toplevel().geometry(value) if value is not None else self.winfo_toplevel().geometry()
+
+    def wm_frame(self):
+        return self.winfo_toplevel().wm_frame()
+
+    def mainloop(self, *args, **kwargs):
+        return self.winfo_toplevel().mainloop(*args, **kwargs)
+
+    def destroy(self):
+        root = self.winfo_toplevel()
+        super().destroy()
+        if self._owns_root:
+            root.destroy()
 
     def table_actions(self, parent, table, next_action=None):
         bar = ttk.Frame(parent)
